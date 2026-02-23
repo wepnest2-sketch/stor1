@@ -76,6 +76,9 @@ create table if not exists public.orders (
   created_at timestamp with time zone default timezone('utc'::text, now())
 );
 
+-- Add instagram_account column to orders table if it doesn't exist
+alter table public.orders add column if not exists instagram_account text;
+
 -- 7. جدول تفاصيل الطلب (Order Items)
 create table if not exists public.order_items (
   id uuid primary key default uuid_generate_v4(),

@@ -1,7 +1,26 @@
 import { supabase } from './supabase';
 import { Product, Wilaya, Municipality, Category, SiteSettings, AboutUsContent } from '../types';
 
+// Simple in-memory cache
+const cache: Record<string, { data: any; timestamp: number }> = {};
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+const getCachedData = (key: string) => {
+  const cached = cache[key];
+  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    return cached.data;
+  }
+  return null;
+};
+
+const setCachedData = (key: string, data: any) => {
+  cache[key] = { data, timestamp: Date.now() };
+};
+
 export const fetchCategories = async (): Promise<Category[]> => {
+  const cached = getCachedData('categories');
+  if (cached) return cached;
+
   const { data, error } = await supabase
     .from('categories')
     .select('*')
@@ -12,15 +31,21 @@ export const fetchCategories = async (): Promise<Category[]> => {
     return [];
   }
   
-  return data.map((c: any) => ({
+  const categories = data.map((c: any) => ({
     id: c.id,
     name: c.name,
     image_url: c.image_url,
     display_order: c.display_order,
   }));
+
+  setCachedData('categories', categories);
+  return categories;
 };
 
 export const fetchSiteSettings = async (): Promise<SiteSettings | null> => {
+  const cached = getCachedData('site_settings');
+  if (cached) return cached;
+
   const { data, error } = await supabase
     .from('site_settings')
     .select('*')
@@ -31,10 +56,14 @@ export const fetchSiteSettings = async (): Promise<SiteSettings | null> => {
     return null;
   }
   
+  setCachedData('site_settings', data);
   return data;
 };
 
 export const fetchAboutUs = async (): Promise<AboutUsContent | null> => {
+  const cached = getCachedData('about_us');
+  if (cached) return cached;
+
   const { data, error } = await supabase
     .from('about_us_content')
     .select('*')
@@ -45,14 +74,20 @@ export const fetchAboutUs = async (): Promise<AboutUsContent | null> => {
     return null;
   }
   
-  return {
+  const aboutUs = {
     title: data.title,
     content: data.content,
     features: data.features || [],
   };
+
+  setCachedData('about_us', aboutUs);
+  return aboutUs;
 };
 
 export const fetchProducts = async (): Promise<Product[]> => {
+  const cached = getCachedData('products');
+  if (cached) return cached;
+
   const { data: products, error } = await supabase
     .from('products')
     .select(`
@@ -65,7 +100,7 @@ export const fetchProducts = async (): Promise<Product[]> => {
     return [];
   }
   
-  return products.map((p: any) => {
+  const mappedProducts = products.map((p: any) => {
     const variants = p.product_variants || [];
     // Derive unique sizes and colors from variants
     const sizes = Array.from(new Set(variants.map((v: any) => v.size))) as string[];
@@ -88,9 +123,15 @@ export const fetchProducts = async (): Promise<Product[]> => {
       colors: colors.length > 0 ? colors : p.colors || [],
     };
   });
+
+  setCachedData('products', mappedProducts);
+  return mappedProducts;
 };
 
 export const fetchWilayas = async (): Promise<Wilaya[]> => {
+  const cached = getCachedData('wilayas');
+  if (cached) return cached;
+
   const { data, error } = await supabase
     .from('wilayas')
     .select('*')
@@ -107,22 +148,67 @@ export const fetchWilayas = async (): Promise<Wilaya[]> => {
     return WILAYAS;
   }
 
-  return data.map((w: any) => ({
+  const wilayas = data.map((w: any) => ({
     id: w.id,
     name: w.name,
     deliveryHome: w.delivery_price_home,
     deliveryPost: w.delivery_price_desk,
   }));
+
+  setCachedData('wilayas', wilayas);
+  return wilayas;
 };
 
 export const createOrder = async (orderData: any) => {
-  const { data, error } = await supabase
+  // 1. Insert into orders table
+  const { data: order, error: orderError } = await supabase
     .from('orders')
-    .insert([orderData])
-    .select();
+    .insert([{
+      customer_first_name: orderData.customer_first_name,
+      customer_last_name: orderData.customer_last_name,
+      customer_phone: orderData.phone_number,
+      wilaya_id: orderData.wilaya_id.toString(), // Ensure it's a string as per schema
+      municipality_name: orderData.municipality,
+      address: orderData.address,
+      delivery_type: orderData.delivery_type,
+      total_price: orderData.total_amount,
+      instagram_account: orderData.instagram_account,
+      status: 'pending'
+    }])
+    .select()
+    .single();
     
-  if (error) {
-    throw error;
+  if (orderError) {
+    console.error('Error creating order:', orderError);
+    throw orderError;
   }
-  return data;
+
+  if (!order) {
+    throw new Error('Failed to create order');
+  }
+
+  // 2. Prepare order items
+  const orderItems = orderData.items.map((item: any) => ({
+    order_id: order.id,
+    product_id: item.id,
+    product_name: item.name,
+    price: item.price,
+    quantity: item.quantity,
+    selected_size: item.selectedSize,
+    selected_color: item.selectedColor
+  }));
+
+  // 3. Insert into order_items table
+  const { error: itemsError } = await supabase
+    .from('order_items')
+    .insert(orderItems);
+
+  if (itemsError) {
+    console.error('Error creating order items:', itemsError);
+    // Ideally we should rollback the order here, but Supabase JS client doesn't support transactions easily without RPC.
+    // For now, we'll just throw.
+    throw itemsError;
+  }
+
+  return order;
 };

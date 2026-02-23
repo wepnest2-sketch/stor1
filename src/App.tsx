@@ -45,6 +45,7 @@ const Navbar = ({
   siteSettings: SiteSettings | null;
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -52,40 +53,85 @@ const Navbar = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const handleNav = (page: string) => {
+    onNavigate(page);
+    setIsMenuOpen(false);
+  };
+
   return (
-    <nav className={`sticky top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      isScrolled ? 'bg-white/95 backdrop-blur-md shadow-sm py-2' : 'bg-white py-4 border-b border-black/5'
-    }`}>
-      <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
-        <button onClick={() => onNavigate('home')} className="flex items-center gap-2">
-          <img src={siteSettings?.logo_url || LOGO_URL} alt="Logo" className="h-10 w-10 object-contain" />
-          <span className="font-serif font-bold text-xl tracking-tighter hidden sm:block">{siteSettings?.site_name || "PAPILLON"}</span>
-        </button>
-
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium uppercase tracking-widest">
-          <button onClick={() => onNavigate('home')} className="hover:opacity-50 transition-opacity">الرئيسية</button>
-          <button onClick={() => onNavigate('all')} className="hover:opacity-50 transition-opacity">المتجر</button>
-          <button onClick={() => onNavigate('about')} className="hover:opacity-50 transition-opacity">من نحن</button>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <button 
-            onClick={onCartOpen}
-            className="relative p-2 hover:bg-black/5 rounded-full transition-colors"
-          >
-            <ShoppingBag size={22} />
-            {cartCount > 0 && (
-              <span className="absolute top-0 right-0 bg-black text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">
-                {cartCount}
-              </span>
-            )}
+    <>
+      <nav className={`sticky top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled ? 'bg-white/95 backdrop-blur-md shadow-sm py-2' : 'bg-white py-4 border-b border-black/5'
+      }`}>
+        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
+          <button onClick={() => onNavigate('home')} className="flex items-center gap-2">
+            <img src={siteSettings?.logo_url || LOGO_URL} alt="Logo" className="h-10 w-10 object-contain" />
+            <span className="font-serif font-bold text-xl tracking-tighter hidden sm:block">{siteSettings?.site_name || "PAPILLON"}</span>
           </button>
-          <button className="md:hidden p-2 hover:bg-black/5 rounded-full">
-            <Menu size={22} />
-          </button>
+
+          <div className="hidden md:flex items-center gap-8 text-sm font-medium uppercase tracking-widest">
+            <button onClick={() => onNavigate('home')} className="hover:opacity-50 transition-opacity">الرئيسية</button>
+            <button onClick={() => onNavigate('all')} className="hover:opacity-50 transition-opacity">المتجر</button>
+            <button onClick={() => onNavigate('about')} className="hover:opacity-50 transition-opacity">من نحن</button>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={onCartOpen}
+              className="relative p-2 hover:bg-black/5 rounded-full transition-colors"
+            >
+              <ShoppingBag size={22} />
+              {cartCount > 0 && (
+                <span className="absolute top-0 right-0 bg-black text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+            <button 
+              onClick={() => setIsMenuOpen(true)}
+              className="md:hidden p-2 hover:bg-black/5 rounded-full"
+            >
+              <Menu size={22} />
+            </button>
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+
+      {/* Mobile Menu Drawer */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMenuOpen(false)}
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] md:hidden"
+            />
+            <motion.div 
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed top-0 right-0 h-full w-3/4 max-w-sm bg-white z-[70] shadow-2xl flex flex-col md:hidden"
+              dir="rtl"
+            >
+              <div className="p-6 border-b flex items-center justify-between">
+                <span className="font-bold text-lg">القائمة</span>
+                <button onClick={() => setIsMenuOpen(false)} className="p-2 hover:bg-neutral-100 rounded-full">
+                  <X size={24} />
+                </button>
+              </div>
+              <div className="flex flex-col p-6 gap-6 text-lg font-medium">
+                <button onClick={() => handleNav('home')} className="text-right hover:text-neutral-500 transition-colors">الرئيسية</button>
+                <button onClick={() => handleNav('all')} className="text-right hover:text-neutral-500 transition-colors">المتجر</button>
+                <button onClick={() => handleNav('about')} className="text-right hover:text-neutral-500 transition-colors">من نحن</button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 
@@ -387,6 +433,7 @@ const ProductDetailPage = ({
     firstName: '',
     lastName: '',
     phone: '',
+    instagram: '',
     wilayaId: '',
     municipalityName: '',
     deliveryType: 'home' as 'home' | 'post',
@@ -462,6 +509,13 @@ const ProductDetailPage = ({
     
     if (!selectedWilaya) return;
 
+    // Phone validation
+    const phoneRegex = /^(05|06|07)[0-9]{8}$/;
+    if (!phoneRegex.test(formData.phone)) {
+      alert("رقم الهاتف غير صحيح. يجب أن يتكون من 10 أرقام ويبدأ بـ 05، 06، أو 07.");
+      return;
+    }
+
     try {
       const orderItem: CartItem = {
         ...product,
@@ -471,13 +525,15 @@ const ProductDetailPage = ({
       };
 
       await createOrder({
-        customer_name: `${formData.firstName} ${formData.lastName}`,
+        customer_first_name: formData.firstName,
+        customer_last_name: formData.lastName,
         phone_number: formData.phone,
-        wilaya_id: parseInt(formData.wilayaId),
+        wilaya_id: formData.wilayaId,
         municipality: formData.municipalityName,
         address: formData.address,
         delivery_type: formData.deliveryType,
         total_amount: total,
+        instagram_account: formData.instagram,
         items: [orderItem]
       });
 
@@ -669,9 +725,23 @@ const ProductDetailPage = ({
                     <input 
                       required
                       type="tel"
+                      maxLength={10}
+                      pattern="[0-9]*"
                       className="w-full border border-neutral-200 p-3 focus:border-black outline-none transition-colors bg-white"
                       value={formData.phone}
-                      onChange={e => setFormData({...formData, phone: e.target.value})}
+                      onChange={e => {
+                        const val = e.target.value.replace(/\D/g, '').slice(0, 10);
+                        setFormData({...formData, phone: val});
+                      }}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase">حساب انستغرام (اختياري)</label>
+                    <input 
+                      className="w-full border border-neutral-200 p-3 focus:border-black outline-none transition-colors bg-white"
+                      value={formData.instagram}
+                      onChange={e => setFormData({...formData, instagram: e.target.value})}
                     />
                   </div>
 
@@ -806,15 +876,24 @@ const CheckoutPage = ({ items, onOrderComplete, wilayas }: { items: CartItem[]; 
     
     if (!selectedWilaya) return;
 
+    // Phone validation
+    const phoneRegex = /^(05|06|07)[0-9]{8}$/;
+    if (!phoneRegex.test(formData.phone)) {
+      alert("رقم الهاتف غير صحيح. يجب أن يتكون من 10 أرقام ويبدأ بـ 05، 06، أو 07.");
+      return;
+    }
+
     try {
       await createOrder({
-        customer_name: `${formData.firstName} ${formData.lastName}`,
+        customer_first_name: formData.firstName,
+        customer_last_name: formData.lastName,
         phone_number: formData.phone,
-        wilaya_id: parseInt(formData.wilayaId),
+        wilaya_id: formData.wilayaId,
         municipality: formData.municipalityName,
         address: formData.address,
         delivery_type: formData.deliveryType,
         total_amount: total,
+        instagram_account: formData.instagram,
         items: items
       });
 
@@ -858,9 +937,14 @@ const CheckoutPage = ({ items, onOrderComplete, wilayas }: { items: CartItem[]; 
               <input 
                 required
                 type="tel"
+                maxLength={10}
+                pattern="[0-9]*"
                 className="w-full border border-neutral-200 p-3 focus:border-black outline-none transition-colors"
                 value={formData.phone}
-                onChange={e => setFormData({...formData, phone: e.target.value})}
+                onChange={e => {
+                  const val = e.target.value.replace(/\D/g, '').slice(0, 10);
+                  setFormData({...formData, phone: val});
+                }}
               />
             </div>
 
@@ -991,27 +1075,48 @@ const CheckoutPage = ({ items, onOrderComplete, wilayas }: { items: CartItem[]; 
   );
 };
 
-const SuccessPage = ({ onHome }: { onHome: () => void }) => (
-  <div className="py-24 flex flex-col items-center justify-center text-center px-4">
-    <motion.div 
-      initial={{ scale: 0 }}
-      animate={{ scale: 1 }}
-      className="w-20 h-20 bg-black text-white rounded-full flex items-center justify-center mb-8"
-    >
-      <CheckCircle2 size={40} />
-    </motion.div>
-    <h1 className="text-4xl font-bold mb-4">تم استلام طلبك بنجاح!</h1>
-    <p className="text-neutral-500 mb-12 max-w-md">
-      شكراً لتسوقك معنا. سنتصل بك قريباً عبر الهاتف لتأكيد الطلب وبدء عملية الشحن.
-    </p>
-    <button 
-      onClick={onHome}
-      className="bg-black text-white px-12 py-4 font-bold tracking-widest hover:bg-neutral-800 transition-colors"
-    >
-      العودة للرئيسية
-    </button>
+const LoadingScreen = ({ logoUrl }: { logoUrl: string }) => (
+  <div className="fixed inset-0 z-[100] bg-white flex items-center justify-center">
+    <img
+      src={logoUrl}
+      alt="Loading"
+      className="w-1/2 max-w-md object-contain"
+    />
   </div>
 );
+
+const SuccessPage = ({ onHome }: { onHome: () => void }) => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onHome();
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [onHome]);
+
+  return (
+    <div className="py-24 flex flex-col items-center justify-center text-center px-4">
+      <motion.div 
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        className="w-20 h-20 bg-black text-white rounded-full flex items-center justify-center mb-8"
+      >
+        <CheckCircle2 size={40} />
+      </motion.div>
+      <h1 className="text-4xl font-bold mb-4">تم استلام طلبك بنجاح!</h1>
+      <p className="text-neutral-500 mb-12 max-w-md">
+        شكراً لتسوقك معنا. سنتصل بك قريباً عبر الهاتف لتأكيد الطلب وبدء عملية الشحن.
+        <br/>
+        <span className="text-sm mt-2 block">سيتم تحويلك للصفحة الرئيسية تلقائياً...</span>
+      </p>
+      <button 
+        onClick={onHome}
+        className="bg-black text-white px-12 py-4 font-bold tracking-widest hover:bg-neutral-800 transition-colors"
+      >
+        العودة للرئيسية
+      </button>
+    </div>
+  );
+};
 
 const AboutUsPage = ({ aboutUs }: { aboutUs: AboutUsContent | null }) => (
   <div className="py-12 md:py-20 max-w-7xl mx-auto px-4" dir="rtl">
@@ -1081,6 +1186,7 @@ export default function App() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
   const [aboutUs, setAboutUs] = useState<AboutUsContent | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -1113,9 +1219,19 @@ export default function App() {
   }, []);
 
   const navigate = (page: string, params: any = null) => {
-    setCurrentPage(page);
-    setPageParams(params);
-    window.scrollTo(0, 0);
+    if (page === 'home' || page === 'product') {
+      setIsLoading(true);
+      setTimeout(() => {
+        setCurrentPage(page);
+        setPageParams(params);
+        window.scrollTo(0, 0);
+        setIsLoading(false);
+      }, 1500);
+    } else {
+      setCurrentPage(page);
+      setPageParams(params);
+      window.scrollTo(0, 0);
+    }
   };
 
   const addToCart = (item: CartItem) => {
@@ -1175,6 +1291,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-white font-sans text-black selection:bg-black selection:text-white">
+      <AnimatePresence>
+        {isLoading && <LoadingScreen logoUrl={siteSettings?.logo_url || LOGO_URL} />}
+      </AnimatePresence>
       <AnnouncementBar text={siteSettings?.announcement_text} />
       <Navbar 
         onCartOpen={() => setIsCartOpen(true)} 
