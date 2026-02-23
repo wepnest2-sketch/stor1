@@ -96,9 +96,15 @@ export const fetchWilayas = async (): Promise<Wilaya[]> => {
     .select('*')
     .order('id', { ascending: true });
     
-  if (error) {
-    console.error('Error fetching wilayas:', error);
-    return [];
+  if (error || !data || data.length === 0) {
+    if (error) console.error('Error fetching wilayas, using fallback:', error);
+    // Fallback to constants if DB is empty or error
+    // Import WILAYAS dynamically to avoid circular dependency issues if any, 
+    // though here it's fine as api.ts imports types only usually.
+    // But better to just return the hardcoded list from constants if we can't get it from DB.
+    // We need to import WILAYAS from constants.
+    const { WILAYAS } = await import('../constants');
+    return WILAYAS;
   }
 
   return data.map((w: any) => ({

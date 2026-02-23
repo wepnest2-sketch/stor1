@@ -22,7 +22,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { Product, CartItem, Wilaya, Category, SiteSettings, AboutUsContent } from './types';
-import { PRODUCTS as MOCK_PRODUCTS, CATEGORIES as MOCK_CATEGORIES, WILAYAS as MOCK_WILAYAS, MUNICIPALITIES, LOGO_URL } from './constants';
+import { LOGO_URL } from './constants';
 import { fetchProducts, fetchWilayas, createOrder, fetchCategories, fetchSiteSettings, fetchAboutUs } from './lib/api';
 
 // --- Components ---
@@ -257,11 +257,22 @@ const HomePage = ({
           transition={{ duration: 1.5 }}
           className="absolute inset-0"
         >
-          <img 
-            src={siteSettings?.hero_image_url || "https://picsum.photos/seed/luxury-hero/1920/1080"} 
-            alt="Hero" 
-            className="w-full h-full object-cover"
-          />
+          <div className="flex h-full w-full">
+            {[
+              "https://res.cloudinary.com/dlwuxgvse/image/upload/v1771870365/Outfit_ideas_N221023_Shirt_Outfit_Ideas_Shirt_Design_Ideas_-_Jasaust_Store_hvs9zp.jpg",
+              "https://res.cloudinary.com/dlwuxgvse/image/upload/v1771870364/Brasil_g6mz9u.jpg",
+              "https://res.cloudinary.com/dlwuxgvse/image/upload/v1771870364/What_happened_this_week_allstreetwear_vaivgw.jpg",
+              "https://res.cloudinary.com/dlwuxgvse/image/upload/v1771870364/Men_s_Autumn_Patchwork_Contrast_Color_Long_Sleeve_T-Shirt_For_Fall_l6hwzn.jpg"
+            ].map((src, idx) => (
+              <div key={idx} className="flex-1 h-full relative border-l border-white/10 first:border-l-0">
+                <img 
+                  src={src} 
+                  alt="Hero" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ))}
+          </div>
           <div className="absolute inset-0 bg-black/40" />
         </motion.div>
         
@@ -295,50 +306,55 @@ const HomePage = ({
       </section>
 
       {/* Categories */}
-      <section className="py-24 max-w-7xl mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-serif font-bold mb-4">تسوق حسب الصنف</h2>
-          <div className="w-20 h-1 bg-black mx-auto" />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {categories.map((cat, idx) => (
-            <motion.div 
-              key={cat.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.1 }}
-              viewport={{ once: true }}
-              onClick={() => onNavigate('category', { id: cat.id })}
-              className="relative aspect-[4/5] overflow-hidden group cursor-pointer"
-            >
-              <img src={cat.image_url || `https://picsum.photos/seed/${cat.id}/800/1000`} alt={cat.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <h3 className="text-white text-3xl font-bold tracking-widest uppercase">{cat.name}</h3>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* Featured Products Strip */}
-      <section className="py-24 bg-neutral-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between mb-12">
-            <h2 className="text-2xl font-serif font-bold">وصلنا حديثاً</h2>
-            <button onClick={() => onNavigate('all')} className="text-sm font-bold border-b border-black pb-1 hover:opacity-50 transition-opacity">مشاهدة الكل</button>
+      {categories.length > 0 && (
+        <section className="py-24 max-w-7xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-serif font-bold mb-4">تسوق حسب الصنف</h2>
+            <div className="w-20 h-1 bg-black mx-auto" />
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {products.slice(0, 4).map(product => (
-              <ProductCard 
-                key={product.id} 
-                product={product} 
-                onClick={() => onNavigate('product', { id: product.id })} 
-              />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {categories.map((cat, idx) => (
+              <motion.div 
+                key={cat.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                viewport={{ once: true }}
+                onClick={() => onNavigate('category', { id: cat.id })}
+                className="relative aspect-square overflow-hidden group cursor-pointer"
+              >
+                <img src={cat.image_url || `https://picsum.photos/seed/${cat.id}/800/800`} alt={cat.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors" />
+                <div className="absolute bottom-0 left-0 right-0 p-6 text-center">
+                  <h3 className="text-white text-xl font-bold tracking-widest uppercase mb-2">{cat.name}</h3>
+                  <span className="text-white/80 text-sm border-b border-white/50 pb-1 inline-block group-hover:text-white group-hover:border-white transition-all">تسوق الآن</span>
+                </div>
+              </motion.div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
+      )}
+
+      {/* Featured Products Strip */}
+      {products.length > 0 && (
+        <section className="py-24 bg-neutral-50">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="flex items-center justify-between mb-12">
+              <h2 className="text-2xl font-serif font-bold">وصلنا حديثاً</h2>
+              <button onClick={() => onNavigate('all')} className="text-sm font-bold border-b border-black pb-1 hover:opacity-50 transition-opacity">مشاهدة الكل</button>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {products.slice(0, 4).map(product => (
+                <ProductCard 
+                  key={product.id} 
+                  product={product} 
+                  onClick={() => onNavigate('product', { id: product.id })} 
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 };
@@ -542,7 +558,7 @@ const ProductDetailPage = ({
                     key={color.name}
                     onClick={() => setSelectedColor(color.name)}
                     className={`px-6 py-2 border text-sm transition-all ${
-                      selectedColor === color.name ? 'bg-black text-white border-black' : 'border-neutral-200 hover:border-black'
+                      selectedColor === color.name ? 'bg-red-600 text-white border-red-600' : 'border-neutral-200 hover:border-red-600 text-neutral-600'
                     }`}
                   >
                     {color.name}
@@ -1060,9 +1076,9 @@ export default function App() {
   const [pageParams, setPageParams] = useState<any>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [products, setProducts] = useState<Product[]>(MOCK_PRODUCTS);
-  const [wilayas, setWilayas] = useState<Wilaya[]>(MOCK_WILAYAS);
-  const [categories, setCategories] = useState<Category[]>(MOCK_CATEGORIES);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [wilayas, setWilayas] = useState<Wilaya[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
   const [aboutUs, setAboutUs] = useState<AboutUsContent | null>(null);
 
