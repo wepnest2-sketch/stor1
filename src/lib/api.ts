@@ -1,20 +1,14 @@
 import { supabase } from './supabase';
+import { cacheManager } from './cacheManager';
 import { Product, Wilaya, Municipality, Category, SiteSettings, AboutUsContent } from '../types';
 
-// Simple in-memory cache
-const cache: Record<string, { data: any; timestamp: number }> = {};
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-
+// استخدام CacheManager المحسّن بدلاً من الـ cache البسيط
 const getCachedData = (key: string) => {
-  const cached = cache[key];
-  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-    return cached.data;
-  }
-  return null;
+  return cacheManager.get(key);
 };
 
-const setCachedData = (key: string, data: any) => {
-  cache[key] = { data, timestamp: Date.now() };
+const setCachedData = (key: string, data: any, ttl?: number) => {
+  cacheManager.set(key, data, ttl);
 };
 
 export const fetchCategories = async (): Promise<Category[]> => {

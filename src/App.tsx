@@ -440,6 +440,10 @@ const ProductDetailPage = ({
     address: ''
   });
 
+  // Error and loading states for Quick Order
+  const [phoneError, setPhoneError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   if (!product) return <div>Product not found</div>;
 
   const variants = product.variants || [];
@@ -512,9 +516,15 @@ const ProductDetailPage = ({
     // Phone validation
     const phoneRegex = /^(05|06|07)[0-9]{8}$/;
     if (!phoneRegex.test(formData.phone)) {
-      alert("رقم الهاتف غير صحيح. يجب أن يتكون من 10 أرقام ويبدأ بـ 05، 06، أو 07.");
+      setPhoneError("رقم الهاتف غير صحيح. يجب أن يتكون من 10 أرقام ويبدأ بـ 05، 06، أو 07.");
       return;
     }
+
+    // منع الإرسال المزدوج - تعطيل الزر أثناء الإرسال
+    if (isSubmitting) return;
+
+    setPhoneError('');
+    setIsSubmitting(true);
 
     try {
       const orderItem: CartItem = {
@@ -540,7 +550,9 @@ const ProductDetailPage = ({
       onNavigate('success');
     } catch (error) {
       console.error("Failed to create order:", error);
-      alert("حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.");
+      setPhoneError("حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -727,13 +739,15 @@ const ProductDetailPage = ({
                       type="tel"
                       maxLength={10}
                       pattern="[0-9]*"
-                      className="w-full border border-neutral-200 p-3 focus:border-black outline-none transition-colors bg-white"
+                      className={`w-full border p-3 focus:outline-none transition-colors bg-white ${phoneError ? 'border-red-500 focus:border-red-500' : 'border-neutral-200 focus:border-black'}`}
                       value={formData.phone}
                       onChange={e => {
                         const val = e.target.value.replace(/\D/g, '').slice(0, 10);
                         setFormData({...formData, phone: val});
+                        if (phoneError) setPhoneError('');
                       }}
                     />
+                    {phoneError && <p className="text-xs text-red-500 mt-1">{phoneError}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -839,9 +853,21 @@ const ProductDetailPage = ({
                   </div>
                   <button 
                     type="submit"
-                    className="w-full bg-black text-white py-5 font-bold tracking-widest hover:bg-neutral-800 transition-colors"
+                    disabled={isSubmitting}
+                    className={`w-full py-5 font-bold tracking-widest transition-all flex items-center justify-center gap-2 ${
+                      isSubmitting 
+                        ? 'bg-neutral-400 text-white cursor-not-allowed' 
+                        : 'bg-black text-white hover:bg-neutral-800'
+                    }`}
                   >
-                    تأكيد الطلب الآن
+                    {isSubmitting ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        جاري الإرسال...
+                      </>
+                    ) : (
+                      'تأكيد الطلب الآن'
+                    )}
                   </button>
                 </div>
               </form>
@@ -865,6 +891,10 @@ const CheckoutPage = ({ items, onOrderComplete, wilayas }: { items: CartItem[]; 
     address: ''
   });
 
+  // Error and loading states
+  const [phoneError, setPhoneError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const selectedWilaya = useMemo(() => wilayas.find(w => w.id === formData.wilayaId), [formData.wilayaId, wilayas]);
   
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -879,9 +909,15 @@ const CheckoutPage = ({ items, onOrderComplete, wilayas }: { items: CartItem[]; 
     // Phone validation
     const phoneRegex = /^(05|06|07)[0-9]{8}$/;
     if (!phoneRegex.test(formData.phone)) {
-      alert("رقم الهاتف غير صحيح. يجب أن يتكون من 10 أرقام ويبدأ بـ 05، 06، أو 07.");
+      setPhoneError("رقم الهاتف غير صحيح. يجب أن يتكون من 10 أرقام ويبدأ بـ 05، 06، أو 07.");
       return;
     }
+
+    // منع الإرسال المزدوج
+    if (isSubmitting) return;
+
+    setPhoneError('');
+    setIsSubmitting(true);
 
     try {
       await createOrder({
@@ -900,7 +936,9 @@ const CheckoutPage = ({ items, onOrderComplete, wilayas }: { items: CartItem[]; 
       onOrderComplete();
     } catch (error) {
       console.error("Failed to create order:", error);
-      alert("حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.");
+      setPhoneError("حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -939,13 +977,15 @@ const CheckoutPage = ({ items, onOrderComplete, wilayas }: { items: CartItem[]; 
                 type="tel"
                 maxLength={10}
                 pattern="[0-9]*"
-                className="w-full border border-neutral-200 p-3 focus:border-black outline-none transition-colors"
+                className={`w-full border p-3 focus:outline-none transition-colors ${phoneError ? 'border-red-500 focus:border-red-500' : 'border-neutral-200 focus:border-black'}`}
                 value={formData.phone}
                 onChange={e => {
                   const val = e.target.value.replace(/\D/g, '').slice(0, 10);
                   setFormData({...formData, phone: val});
+                  if (phoneError) setPhoneError('');
                 }}
               />
+              {phoneError && <p className="text-xs text-red-500 mt-1">{phoneError}</p>}
             </div>
 
             <div className="space-y-2">
@@ -1027,9 +1067,21 @@ const CheckoutPage = ({ items, onOrderComplete, wilayas }: { items: CartItem[]; 
 
             <button 
               type="submit"
-              className="w-full bg-black text-white py-5 font-bold tracking-widest hover:bg-neutral-800 transition-colors"
+              disabled={isSubmitting}
+              className={`w-full py-5 font-bold tracking-widest transition-all flex items-center justify-center gap-2 ${
+                isSubmitting 
+                  ? 'bg-neutral-400 text-white cursor-not-allowed' 
+                  : 'bg-black text-white hover:bg-neutral-800'
+              }`}
             >
-              تأكيد الطلب
+              {isSubmitting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  جاري الإرسال...
+                </>
+              ) : (
+                'تأكيد الطلب'
+              )}
             </button>
           </form>
         </div>
