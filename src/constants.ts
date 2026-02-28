@@ -1,6 +1,6 @@
 import { Product, Wilaya } from "./types";
 
-export const LOGO_URL = "https://res.cloudinary.com/dhyp0k6b2/image/upload/v1771688903/434186110_754831856741654_3189618891943124343_n_rsrlhw.jpg";
+export const LOGO_URL = "https://res.cloudinary.com/dlwuxgvse/image/upload/v1772288060/434186110_754831856741654_3189618891943124343_n_zqvux4.png";
 
 export const CATEGORIES = [
   { id: "men", name: "رجالي", image: "https://picsum.photos/seed/men/800/1000" },
