@@ -5,16 +5,16 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  ShoppingBag, 
-  Menu, 
-  X, 
-  ChevronRight, 
-  ChevronLeft, 
-  Instagram, 
-  Phone, 
-  MapPin, 
-  Truck, 
+import {
+  ShoppingBag,
+  Menu,
+  X,
+  ChevronRight,
+  ChevronLeft,
+  Instagram,
+  Phone,
+  MapPin,
+  Truck,
   CreditCard,
   Plus,
   Minus,
@@ -33,13 +33,13 @@ const AnnouncementBar = ({ text }: { text?: string }) => (
   </div>
 );
 
-const Navbar = ({ 
-  onCartOpen, 
-  cartCount, 
+const Navbar = ({
+  onCartOpen,
+  cartCount,
   onNavigate,
   siteSettings
-}: { 
-  onCartOpen: () => void; 
+}: {
+  onCartOpen: () => void;
   cartCount: number;
   onNavigate: (page: string, params?: any) => void;
   siteSettings: SiteSettings | null;
@@ -60,9 +60,8 @@ const Navbar = ({
 
   return (
     <>
-      <nav className={`sticky top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white/95 backdrop-blur-md shadow-sm py-2' : 'bg-white py-4 border-b border-black/5'
-      }`}>
+      <nav className={`sticky top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white/95 backdrop-blur-md shadow-sm py-2' : 'bg-white py-4 border-b border-black/5'
+        }`}>
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
           <button onClick={() => onNavigate('home')} className="flex items-center gap-2">
             <img src={siteSettings?.logo_url || LOGO_URL} alt="Logo" className="h-10 w-10 object-contain" />
@@ -76,7 +75,7 @@ const Navbar = ({
           </div>
 
           <div className="flex items-center gap-4">
-            <button 
+            <button
               onClick={onCartOpen}
               className="relative p-2 hover:bg-black/5 rounded-full transition-colors"
             >
@@ -87,7 +86,7 @@ const Navbar = ({
                 </span>
               )}
             </button>
-            <button 
+            <button
               onClick={() => setIsMenuOpen(true)}
               className="md:hidden p-2 hover:bg-black/5 rounded-full"
             >
@@ -101,14 +100,14 @@ const Navbar = ({
       <AnimatePresence>
         {isMenuOpen && (
           <>
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMenuOpen(false)}
               className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] md:hidden"
             />
-            <motion.div 
+            <motion.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
@@ -142,7 +141,7 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product, onClick }: ProductCardProps) => (
-  <motion.div 
+  <motion.div
     layout
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
@@ -151,8 +150,8 @@ const ProductCard = ({ product, onClick }: ProductCardProps) => (
     onClick={onClick}
   >
     <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100 mb-4">
-      <img 
-        src={product.images[0]} 
+      <img
+        src={product.images[0]}
         alt={product.name}
         loading="lazy"
         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -178,16 +177,16 @@ const ProductCard = ({ product, onClick }: ProductCardProps) => (
   </motion.div>
 );
 
-const CartDrawer = ({ 
-  isOpen, 
-  onClose, 
-  items, 
-  onUpdateQuantity, 
+const CartDrawer = ({
+  isOpen,
+  onClose,
+  items,
+  onUpdateQuantity,
   onRemove,
   onCheckout
-}: { 
-  isOpen: boolean; 
-  onClose: () => void; 
+}: {
+  isOpen: boolean;
+  onClose: () => void;
   items: CartItem[];
   onUpdateQuantity: (id: string, size: string, color: string, delta: number) => void;
   onRemove: (id: string, size: string, color: string) => void;
@@ -199,14 +198,14 @@ const CartDrawer = ({
     <AnimatePresence>
       {isOpen && (
         <>
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
             className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60]"
           />
-          <motion.div 
+          <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
@@ -238,14 +237,14 @@ const CartDrawer = ({
                       </p>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center border border-neutral-200 rounded">
-                          <button 
+                          <button
                             onClick={() => onUpdateQuantity(item.id, item.selectedSize, item.selectedColor, -1)}
                             className="p-1 hover:bg-neutral-50"
                           >
                             <Minus size={14} />
                           </button>
                           <span className="px-3 text-sm">{item.quantity}</span>
-                          <button 
+                          <button
                             onClick={() => onUpdateQuantity(item.id, item.selectedSize, item.selectedColor, 1)}
                             className="p-1 hover:bg-neutral-50"
                           >
@@ -266,7 +265,7 @@ const CartDrawer = ({
                   <span className="text-neutral-500">المجموع الفرعي</span>
                   <span className="text-xl font-bold">{total.toLocaleString()} دج</span>
                 </div>
-                <button 
+                <button
                   onClick={onCheckout}
                   className="w-full bg-black text-white py-4 font-bold tracking-widest hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2"
                 >
@@ -283,13 +282,13 @@ const CartDrawer = ({
 
 // --- Pages ---
 
-const HomePage = ({ 
-  onNavigate, 
-  products, 
-  categories, 
-  siteSettings 
-}: { 
-  onNavigate: (page: string, params?: any) => void; 
+const HomePage = ({
+  onNavigate,
+  products,
+  categories,
+  siteSettings
+}: {
+  onNavigate: (page: string, params?: any) => void;
   products: Product[];
   categories: Category[];
   siteSettings: SiteSettings | null;
@@ -298,7 +297,7 @@ const HomePage = ({
     <div>
       {/* Hero Section */}
       <section className="relative h-[85vh] flex items-center justify-center overflow-hidden">
-        <motion.div 
+        <motion.div
           initial={{ scale: 1.1, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 1.5 }}
@@ -312,9 +311,9 @@ const HomePage = ({
               "https://res.cloudinary.com/dlwuxgvse/image/upload/v1771870364/Men_s_Autumn_Patchwork_Contrast_Color_Long_Sleeve_T-Shirt_For_Fall_l6hwzn.jpg"
             ].map((src, idx) => (
               <div key={idx} className="flex-1 h-full relative border-l border-white/10 first:border-l-0">
-                <img 
-                  src={src} 
-                  alt="Hero" 
+                <img
+                  src={src}
+                  alt="Hero"
                   loading="lazy"
                   className="w-full h-full object-cover"
                 />
@@ -323,9 +322,9 @@ const HomePage = ({
           </div>
           <div className="absolute inset-0 bg-black/40" />
         </motion.div>
-        
+
         <div className="relative z-10 text-center text-white px-4">
-          <motion.h1 
+          <motion.h1
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.5 }}
@@ -333,7 +332,7 @@ const HomePage = ({
           >
             {siteSettings?.hero_title || "PAPILLON"}
           </motion.h1>
-          <motion.p 
+          <motion.p
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.7 }}
@@ -341,7 +340,7 @@ const HomePage = ({
           >
             {siteSettings?.hero_subtitle || "اكتشف مجموعتنا الجديدة المصممة خصيصاً لمن يبحث عن التميز والرقي."}
           </motion.p>
-          <motion.button 
+          <motion.button
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.9 }}
@@ -362,7 +361,7 @@ const HomePage = ({
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {categories.map((cat, idx) => (
-              <motion.div 
+              <motion.div
                 key={cat.id}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -393,10 +392,10 @@ const HomePage = ({
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {products.slice(0, 4).map(product => (
-                <ProductCard 
-                  key={product.id} 
-                  product={product} 
-                  onClick={() => onNavigate('product', { id: product.id })} 
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onClick={() => onNavigate('product', { id: product.id })}
                 />
               ))}
             </div>
@@ -407,15 +406,15 @@ const HomePage = ({
   );
 };
 
-const ProductDetailPage = ({ 
-  productId, 
+const ProductDetailPage = ({
+  productId,
   onAddToCart,
   onNavigate,
   products,
   wilayas,
   categories
-}: { 
-  productId: string; 
+}: {
+  productId: string;
   onAddToCart: (item: CartItem) => void;
   onNavigate: (page: string, params?: any) => void;
   products: Product[];
@@ -456,22 +455,22 @@ const ProductDetailPage = ({
     if (!hasVariants) return product.sizes;
     if (selectedColor) {
       return Array.from(new Set(variants
-        .filter(v => v.color_name === selectedColor && v.quantity > 0)
+        .filter(v => v.color_name === selectedColor)
         .map(v => v.size)));
     }
-    return Array.from(new Set(variants.filter(v => v.quantity > 0).map(v => v.size)));
+    return Array.from(new Set(variants.map(v => v.size)));
   }, [product, selectedColor, hasVariants, variants]);
 
   const availableColors = useMemo(() => {
     if (!hasVariants) return product.colors;
     if (selectedSize) {
-      const filtered = variants.filter(v => v.size === selectedSize && v.quantity > 0);
+      const filtered = variants.filter(v => v.size === selectedSize);
       const map = new Map();
       filtered.forEach(v => map.set(v.color_name, { name: v.color_name, hex: v.color_hex }));
       return Array.from(map.values());
     }
     const map = new Map();
-    variants.filter(v => v.quantity > 0).forEach(v => map.set(v.color_name, { name: v.color_name, hex: v.color_hex }));
+    variants.forEach(v => map.set(v.color_name, { name: v.color_name, hex: v.color_hex }));
     return Array.from(map.values());
   }, [product, selectedSize, hasVariants, variants]);
 
@@ -481,7 +480,7 @@ const ProductDetailPage = ({
       const variant = variants.find(v => v.size === selectedSize && v.color_name === selectedColor);
       return variant ? variant.quantity : 0;
     }
-    return 1;
+    return 100; // Allow high quantity if no variants to restrict
   }, [product, selectedSize, selectedColor, hasVariants, variants]);
 
   // Reset selection if not available
@@ -498,7 +497,7 @@ const ProductDetailPage = ({
   }, [availableColors, selectedColor]);
 
   const isSelectionComplete = selectedSize !== '' && selectedColor !== '';
-  
+
   const selectedWilaya = useMemo(() => wilayas.find(w => w.id === formData.wilayaId), [formData.wilayaId, wilayas]);
   const deliveryFee = selectedWilaya ? (formData.deliveryType === 'home' ? selectedWilaya.deliveryHome : selectedWilaya.deliveryPost) : 0;
   const productPrice = product.discount_price || product.price;
@@ -513,7 +512,7 @@ const ProductDetailPage = ({
 
   const handleQuickOrder = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!selectedWilaya) return;
 
     // Phone validation
@@ -569,7 +568,7 @@ const ProductDetailPage = ({
           </div>
           <div className="flex gap-4">
             {product.images.map((img, idx) => (
-              <button 
+              <button
                 key={idx}
                 onClick={() => setActiveImage(idx)}
                 className={`w-20 h-24 border-2 transition-colors ${activeImage === idx ? 'border-black' : 'border-transparent'}`}
@@ -582,7 +581,7 @@ const ProductDetailPage = ({
 
         {/* Info */}
         <div className="flex flex-col">
-          <button 
+          <button
             onClick={() => onNavigate('category', { id: product.category })}
             className="text-xs text-neutral-400 uppercase tracking-widest mb-2 hover:text-black transition-colors text-right"
           >
@@ -599,7 +598,7 @@ const ProductDetailPage = ({
               <p className="text-2xl font-light">{product.price.toLocaleString()} دج</p>
             )}
           </div>
-          
+
           <div className="space-y-8 mb-12">
             {/* Sizes */}
             <div>
@@ -609,9 +608,8 @@ const ProductDetailPage = ({
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
-                    className={`px-6 py-2 border text-sm transition-all ${
-                      selectedSize === size ? 'bg-black text-white border-black' : 'border-neutral-200 hover:border-black'
-                    }`}
+                    className={`px-6 py-2 border text-sm transition-all ${selectedSize === size ? 'bg-black text-white border-black' : 'border-neutral-200 hover:border-black'
+                      }`}
                   >
                     {size}
                   </button>
@@ -628,9 +626,8 @@ const ProductDetailPage = ({
                   <button
                     key={color.name}
                     onClick={() => setSelectedColor(color.name)}
-                    className={`px-6 py-2 border text-sm transition-all ${
-                      selectedColor === color.name ? 'bg-red-600 text-white border-red-600' : 'border-neutral-200 hover:border-red-600 text-neutral-600'
-                    }`}
+                    className={`px-6 py-2 border text-sm transition-all ${selectedColor === color.name ? 'bg-red-600 text-white border-red-600' : 'border-neutral-200 hover:border-red-600 text-neutral-600'
+                      }`}
                   >
                     {color.name}
                   </button>
@@ -642,7 +639,7 @@ const ProductDetailPage = ({
             {/* Quantity */}
             <div>
               <label className="block text-xs font-bold uppercase tracking-widest mb-4">
-                الكمية 
+                الكمية
                 {hasVariants && isSelectionComplete && (
                   <span className={`font-normal mr-2 ${maxQuantity > 5 ? 'text-green-600' : maxQuantity > 0 ? 'text-orange-500' : 'text-red-500'}`}>
                     ({maxQuantity > 5 ? 'متوفر' : maxQuantity > 0 ? 'منخفض' : 'غير متوفر'})
@@ -658,25 +655,23 @@ const ProductDetailPage = ({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-            <button 
+            <button
               disabled={!isSelectionComplete}
               onClick={() => onAddToCart({ ...product, selectedSize, selectedColor, quantity })}
-              className={`w-full py-5 font-bold tracking-widest transition-all ${
-                isSelectionComplete 
-                ? 'bg-neutral-100 text-black hover:bg-neutral-200' 
+              className={`w-full py-5 font-bold tracking-widest transition-all ${isSelectionComplete
+                ? 'bg-neutral-100 text-black hover:bg-neutral-200'
                 : 'bg-neutral-50 text-neutral-300 cursor-not-allowed'
-              }`}
+                }`}
             >
               إضافة إلى السلة
             </button>
-            <button 
+            <button
               disabled={!isSelectionComplete}
               onClick={handleQuickOrderClick}
-              className={`w-full py-5 font-bold tracking-widest transition-all ${
-                isSelectionComplete 
-                ? 'bg-black text-white hover:bg-neutral-800' 
+              className={`w-full py-5 font-bold tracking-widest transition-all ${isSelectionComplete
+                ? 'bg-black text-white hover:bg-neutral-800'
                 : 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
-              }`}
+                }`}
             >
               طلب سريع الآن
             </button>
@@ -699,7 +694,7 @@ const ProductDetailPage = ({
       {/* Quick Order Form Section */}
       <AnimatePresence>
         {showQuickOrder && isSelectionComplete && (
-          <motion.div 
+          <motion.div
             ref={quickOrderRef}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -717,27 +712,27 @@ const ProductDetailPage = ({
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-xs font-bold uppercase">اللقب</label>
-                      <input 
+                      <input
                         required
                         className="w-full border border-neutral-200 p-3 focus:border-black outline-none transition-colors bg-white"
                         value={formData.lastName}
-                        onChange={e => setFormData({...formData, lastName: e.target.value})}
+                        onChange={e => setFormData({ ...formData, lastName: e.target.value })}
                       />
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-bold uppercase">الاسم</label>
-                      <input 
+                      <input
                         required
                         className="w-full border border-neutral-200 p-3 focus:border-black outline-none transition-colors bg-white"
                         value={formData.firstName}
-                        onChange={e => setFormData({...formData, firstName: e.target.value})}
+                        onChange={e => setFormData({ ...formData, firstName: e.target.value })}
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase">رقم الهاتف</label>
-                    <input 
+                    <input
                       required
                       type="tel"
                       maxLength={10}
@@ -746,7 +741,7 @@ const ProductDetailPage = ({
                       value={formData.phone}
                       onChange={e => {
                         const val = e.target.value.replace(/\D/g, '').slice(0, 10);
-                        setFormData({...formData, phone: val});
+                        setFormData({ ...formData, phone: val });
                         if (phoneError) setPhoneError('');
                       }}
                     />
@@ -755,22 +750,22 @@ const ProductDetailPage = ({
 
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase">حساب انستغرام (اختياري)</label>
-                    <input 
+                    <input
                       className="w-full border border-neutral-200 p-3 focus:border-black outline-none transition-colors bg-white"
                       placeholder="papillon_17_djelfa"
                       value={formData.instagram}
-                      onChange={e => setFormData({...formData, instagram: e.target.value})}
+                      onChange={e => setFormData({ ...formData, instagram: e.target.value })}
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-xs font-bold uppercase">الولاية</label>
-                      <select 
+                      <select
                         required
                         className="w-full border border-neutral-200 p-3 focus:border-black outline-none transition-colors bg-white"
                         value={formData.wilayaId}
-                        onChange={e => setFormData({...formData, wilayaId: e.target.value, municipalityName: ''})}
+                        onChange={e => setFormData({ ...formData, wilayaId: e.target.value, municipalityName: '' })}
                       >
                         <option value="">اختر الولاية</option>
                         {wilayas.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
@@ -778,12 +773,12 @@ const ProductDetailPage = ({
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-bold uppercase">البلدية</label>
-                      <input 
+                      <input
                         required
                         placeholder="اكتب اسم البلدية"
                         className="w-full border border-neutral-200 p-3 focus:border-black outline-none transition-colors bg-white"
                         value={formData.municipalityName}
-                        onChange={e => setFormData({...formData, municipalityName: e.target.value})}
+                        onChange={e => setFormData({ ...formData, municipalityName: e.target.value })}
                       />
                     </div>
                   </div>
@@ -793,20 +788,18 @@ const ProductDetailPage = ({
                     <div className="grid grid-cols-2 gap-4">
                       <button
                         type="button"
-                        onClick={() => setFormData({...formData, deliveryType: 'home'})}
-                        className={`p-4 border flex flex-col items-center gap-2 transition-all ${
-                          formData.deliveryType === 'home' ? 'border-black bg-black text-white' : 'border-neutral-200 bg-white hover:border-black'
-                        }`}
+                        onClick={() => setFormData({ ...formData, deliveryType: 'home' })}
+                        className={`p-4 border flex flex-col items-center gap-2 transition-all ${formData.deliveryType === 'home' ? 'border-black bg-black text-white' : 'border-neutral-200 bg-white hover:border-black'
+                          }`}
                       >
                         <Truck size={20} />
                         <span className="text-sm font-bold">توصيل للمنزل</span>
                       </button>
                       <button
                         type="button"
-                        onClick={() => setFormData({...formData, deliveryType: 'post'})}
-                        className={`p-4 border flex flex-col items-center gap-2 transition-all ${
-                          formData.deliveryType === 'post' ? 'border-black bg-black text-white' : 'border-neutral-200 bg-white hover:border-black'
-                        }`}
+                        onClick={() => setFormData({ ...formData, deliveryType: 'post' })}
+                        className={`p-4 border flex flex-col items-center gap-2 transition-all ${formData.deliveryType === 'post' ? 'border-black bg-black text-white' : 'border-neutral-200 bg-white hover:border-black'
+                          }`}
                       >
                         <MapPin size={20} />
                         <span className="text-sm font-bold">ZR Express</span>
@@ -817,11 +810,11 @@ const ProductDetailPage = ({
                   {formData.deliveryType === 'home' && (
                     <div className="space-y-2">
                       <label className="text-xs font-bold uppercase">عنوان المنزل</label>
-                      <textarea 
+                      <textarea
                         required
                         className="w-full border border-neutral-200 p-3 focus:border-black outline-none transition-colors bg-white min-h-[80px]"
                         value={formData.address}
-                        onChange={e => setFormData({...formData, address: e.target.value})}
+                        onChange={e => setFormData({ ...formData, address: e.target.value })}
                       />
                     </div>
                   )}
@@ -848,21 +841,20 @@ const ProductDetailPage = ({
                     </div>
                     <div className="flex justify-between">
                       <span className="text-neutral-500">سعر التوصيل:</span>
-                      <span>{deliveryFee.toLocaleString()} دج</span>
+                      <span>{!selectedWilaya ? 'يحدد لاحقاً' : `${deliveryFee.toLocaleString()} دج`}</span>
                     </div>
                     <div className="border-t pt-4 flex justify-between text-lg font-bold">
                       <span>الإجمالي:</span>
                       <span>{total.toLocaleString()} دج</span>
                     </div>
                   </div>
-                  <button 
+                  <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`w-full py-5 font-bold tracking-widest transition-all flex items-center justify-center gap-2 ${
-                      isSubmitting 
-                        ? 'bg-neutral-400 text-white cursor-not-allowed' 
-                        : 'bg-black text-white hover:bg-neutral-800'
-                    }`}
+                    className={`w-full py-5 font-bold tracking-widest transition-all flex items-center justify-center gap-2 ${isSubmitting
+                      ? 'bg-neutral-400 text-white cursor-not-allowed'
+                      : 'bg-black text-white hover:bg-neutral-800'
+                      }`}
                   >
                     {isSubmitting ? (
                       <>
@@ -900,14 +892,14 @@ const CheckoutPage = ({ items, onOrderComplete, wilayas }: { items: CartItem[]; 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const selectedWilaya = useMemo(() => wilayas.find(w => w.id === formData.wilayaId), [formData.wilayaId, wilayas]);
-  
+
   const subtotal = items.reduce((sum, item) => sum + (item.discount_price || item.price) * item.quantity, 0);
   const deliveryFee = selectedWilaya ? (formData.deliveryType === 'home' ? selectedWilaya.deliveryHome : selectedWilaya.deliveryPost) : 0;
   const total = subtotal + deliveryFee;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!selectedWilaya) return;
 
     // Phone validation
@@ -956,27 +948,27 @@ const CheckoutPage = ({ items, onOrderComplete, wilayas }: { items: CartItem[]; 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase">اللقب</label>
-                <input 
+                <input
                   required
                   className="w-full border border-neutral-200 p-3 focus:border-black outline-none transition-colors"
                   value={formData.lastName}
-                  onChange={e => setFormData({...formData, lastName: e.target.value})}
+                  onChange={e => setFormData({ ...formData, lastName: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase">الاسم</label>
-                <input 
+                <input
                   required
                   className="w-full border border-neutral-200 p-3 focus:border-black outline-none transition-colors"
                   value={formData.firstName}
-                  onChange={e => setFormData({...formData, firstName: e.target.value})}
+                  onChange={e => setFormData({ ...formData, firstName: e.target.value })}
                 />
               </div>
             </div>
 
             <div className="space-y-2">
               <label className="text-xs font-bold uppercase">رقم الهاتف</label>
-              <input 
+              <input
                 required
                 type="tel"
                 maxLength={10}
@@ -985,7 +977,7 @@ const CheckoutPage = ({ items, onOrderComplete, wilayas }: { items: CartItem[]; 
                 value={formData.phone}
                 onChange={e => {
                   const val = e.target.value.replace(/\D/g, '').slice(0, 10);
-                  setFormData({...formData, phone: val});
+                  setFormData({ ...formData, phone: val });
                   if (phoneError) setPhoneError('');
                 }}
               />
@@ -994,22 +986,22 @@ const CheckoutPage = ({ items, onOrderComplete, wilayas }: { items: CartItem[]; 
 
             <div className="space-y-2">
               <label className="text-xs font-bold uppercase">حساب انستغرام (اختياري)</label>
-              <input 
+              <input
                 className="w-full border border-neutral-200 p-3 focus:border-black outline-none transition-colors"
                 placeholder="papillon_17_djelfa"
                 value={formData.instagram}
-                onChange={e => setFormData({...formData, instagram: e.target.value})}
+                onChange={e => setFormData({ ...formData, instagram: e.target.value })}
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase">الولاية</label>
-                <select 
+                <select
                   required
                   className="w-full border border-neutral-200 p-3 focus:border-black outline-none transition-colors bg-white"
                   value={formData.wilayaId}
-                  onChange={e => setFormData({...formData, wilayaId: e.target.value, municipalityName: ''})}
+                  onChange={e => setFormData({ ...formData, wilayaId: e.target.value, municipalityName: '' })}
                 >
                   <option value="">اختر الولاية</option>
                   {wilayas.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
@@ -1017,12 +1009,12 @@ const CheckoutPage = ({ items, onOrderComplete, wilayas }: { items: CartItem[]; 
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase">البلدية</label>
-                <input 
+                <input
                   required
                   placeholder="اكتب اسم البلدية"
                   className="w-full border border-neutral-200 p-3 focus:border-black outline-none transition-colors bg-white"
                   value={formData.municipalityName}
-                  onChange={e => setFormData({...formData, municipalityName: e.target.value})}
+                  onChange={e => setFormData({ ...formData, municipalityName: e.target.value })}
                 />
               </div>
             </div>
@@ -1032,20 +1024,18 @@ const CheckoutPage = ({ items, onOrderComplete, wilayas }: { items: CartItem[]; 
               <div className="grid grid-cols-2 gap-4">
                 <button
                   type="button"
-                  onClick={() => setFormData({...formData, deliveryType: 'home'})}
-                  className={`p-4 border flex flex-col items-center gap-2 transition-all ${
-                    formData.deliveryType === 'home' ? 'border-black bg-black text-white' : 'border-neutral-200 hover:border-black'
-                  }`}
+                  onClick={() => setFormData({ ...formData, deliveryType: 'home' })}
+                  className={`p-4 border flex flex-col items-center gap-2 transition-all ${formData.deliveryType === 'home' ? 'border-black bg-black text-white' : 'border-neutral-200 hover:border-black'
+                    }`}
                 >
                   <Truck size={20} />
                   <span className="text-sm font-bold">توصيل للمنزل</span>
                 </button>
                 <button
                   type="button"
-                  onClick={() => setFormData({...formData, deliveryType: 'post'})}
-                  className={`p-4 border flex flex-col items-center gap-2 transition-all ${
-                    formData.deliveryType === 'post' ? 'border-black bg-black text-white' : 'border-neutral-200 hover:border-black'
-                  }`}
+                  onClick={() => setFormData({ ...formData, deliveryType: 'post' })}
+                  className={`p-4 border flex flex-col items-center gap-2 transition-all ${formData.deliveryType === 'post' ? 'border-black bg-black text-white' : 'border-neutral-200 hover:border-black'
+                    }`}
                 >
                   <MapPin size={20} />
                   <span className="text-sm font-bold">مكتب البريد</span>
@@ -1054,30 +1044,29 @@ const CheckoutPage = ({ items, onOrderComplete, wilayas }: { items: CartItem[]; 
             </div>
 
             {formData.deliveryType === 'home' && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 className="space-y-2"
               >
                 <label className="text-xs font-bold uppercase">عنوان المنزل بالتفصيل</label>
-                <textarea 
+                <textarea
                   required
                   className="w-full border border-neutral-200 p-3 focus:border-black outline-none transition-colors min-h-[100px]"
                   value={formData.address}
-                  onChange={e => setFormData({...formData, address: e.target.value})}
+                  onChange={e => setFormData({ ...formData, address: e.target.value })}
                   placeholder="رقم الباب، الشارع، الحي..."
                 />
               </motion.div>
             )}
 
-            <button 
+            <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full py-5 font-bold tracking-widest transition-all flex items-center justify-center gap-2 ${
-                isSubmitting 
-                  ? 'bg-neutral-400 text-white cursor-not-allowed' 
-                  : 'bg-black text-white hover:bg-neutral-800'
-              }`}
+              className={`w-full py-5 font-bold tracking-widest transition-all flex items-center justify-center gap-2 ${isSubmitting
+                ? 'bg-neutral-400 text-white cursor-not-allowed'
+                : 'bg-black text-white hover:bg-neutral-800'
+                }`}
             >
               {isSubmitting ? (
                 <>
@@ -1119,7 +1108,7 @@ const CheckoutPage = ({ items, onOrderComplete, wilayas }: { items: CartItem[]; 
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-neutral-500">التوصيل</span>
-              <span>{deliveryFee === 0 ? 'يحدد لاحقاً' : `${deliveryFee.toLocaleString()} دج`}</span>
+              <span>{!selectedWilaya ? 'يحدد لاحقاً' : `${deliveryFee.toLocaleString()} دج`}</span>
             </div>
             <div className="flex justify-between text-xl font-bold pt-4 border-t">
               <span>الإجمالي</span>
@@ -1152,7 +1141,7 @@ const SuccessPage = ({ onHome }: { onHome: () => void }) => {
 
   return (
     <div className="py-24 flex flex-col items-center justify-center text-center px-4">
-      <motion.div 
+      <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         className="w-20 h-20 bg-black text-white rounded-full flex items-center justify-center mb-8"
@@ -1162,10 +1151,10 @@ const SuccessPage = ({ onHome }: { onHome: () => void }) => {
       <h1 className="text-4xl font-bold mb-4">تم استلام طلبك بنجاح!</h1>
       <p className="text-neutral-500 mb-12 max-w-md">
         شكراً لتسوقك معنا. سنتصل بك قريباً عبر الهاتف لتأكيد الطلب وبدء عملية الشحن.
-        <br/>
+        <br />
         <span className="text-sm mt-2 block">سيتم تحويلك للصفحة الرئيسية تلقائياً...</span>
       </p>
-      <button 
+      <button
         onClick={onHome}
         className="bg-black text-white px-12 py-4 font-bold tracking-widest hover:bg-neutral-800 transition-colors"
       >
@@ -1189,7 +1178,7 @@ const AboutUsPage = ({ aboutUs }: { aboutUs: AboutUsContent | null }) => (
         
         فريقنا يعمل بشغف لاختيار قطع فريدة تناسب تطلعاتكم، ونسعى دائماً لتطوير خدماتنا لنكون عند حسن ظنكم دائماً.`}
       </div>
-      
+
       <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
         {(aboutUs?.features || [
           { title: "الجودة", description: "نختار أفضل الأقمشة والخامات لضمان ديمومة القطع." },
@@ -1206,14 +1195,14 @@ const AboutUsPage = ({ aboutUs }: { aboutUs: AboutUsContent | null }) => (
   </div>
 );
 
-const AllProductsPage = ({ 
-  title, 
-  products, 
+const AllProductsPage = ({
+  title,
+  products,
   onNavigate,
   categories
-}: { 
-  title: string; 
-  products: Product[]; 
+}: {
+  title: string;
+  products: Product[];
   onNavigate: (page: string, params?: any) => void;
   categories: Category[];
 }) => (
@@ -1223,10 +1212,10 @@ const AllProductsPage = ({
     </div>
     <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-12">
       {products.map(product => (
-        <ProductCard 
-          key={product.id} 
-          product={product} 
-          onClick={() => onNavigate('product', { id: product.id })} 
+        <ProductCard
+          key={product.id}
+          product={product}
+          onClick={() => onNavigate('product', { id: product.id })}
         />
       ))}
     </div>
@@ -1251,7 +1240,7 @@ export default function App() {
       if (fetchedProducts.length > 0) {
         setProducts(fetchedProducts);
       }
-      
+
       const fetchedWilayas = await fetchWilayas();
       if (fetchedWilayas.length > 0) {
         setWilayas(fetchedWilayas);
@@ -1293,13 +1282,13 @@ export default function App() {
 
   const addToCart = (item: CartItem) => {
     setCart(prev => {
-      const existing = prev.find(i => 
-        i.id === item.id && 
-        i.selectedSize === item.selectedSize && 
+      const existing = prev.find(i =>
+        i.id === item.id &&
+        i.selectedSize === item.selectedSize &&
         i.selectedColor === item.selectedColor
       );
       if (existing) {
-        return prev.map(i => 
+        return prev.map(i =>
           i === existing ? { ...i, quantity: i.quantity + item.quantity } : i
         );
       }
@@ -1318,7 +1307,7 @@ export default function App() {
   };
 
   const removeFromCart = (id: string, size: string, color: string) => {
-    setCart(prev => prev.filter(item => 
+    setCart(prev => prev.filter(item =>
       !(item.id === id && item.selectedSize === size && item.selectedColor === color)
     ));
   };
@@ -1352,20 +1341,20 @@ export default function App() {
         {isLoading && <LoadingScreen logoUrl={siteSettings?.logo_url || LOGO_URL} />}
       </AnimatePresence>
       <AnnouncementBar text={siteSettings?.announcement_text} />
-      <Navbar 
-        onCartOpen={() => setIsCartOpen(true)} 
+      <Navbar
+        onCartOpen={() => setIsCartOpen(true)}
         cartCount={cart.reduce((sum, i) => sum + i.quantity, 0)}
         onNavigate={navigate}
         siteSettings={siteSettings}
       />
-      
+
       <main>
         {renderPage()}
       </main>
 
-      <CartDrawer 
-        isOpen={isCartOpen} 
-        onClose={() => setIsCartOpen(false)} 
+      <CartDrawer
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
         items={cart}
         onUpdateQuantity={updateQuantity}
         onRemove={removeFromCart}
@@ -1384,7 +1373,7 @@ export default function App() {
               وجهتكم الأولى للأناقة والفخامة في الجزائر. نوفر لكم أجود أنواع الملابس مع خدمة توصيل احترافية لجميع الولايات.
             </p>
           </div>
-          
+
           <div>
             <h4 className="font-bold mb-6 uppercase tracking-widest text-sm">روابط سريعة</h4>
             <ul className="space-y-4 text-neutral-400 text-sm">
@@ -1408,9 +1397,9 @@ export default function App() {
             <h4 className="font-bold mb-6 uppercase tracking-widest text-sm">Zr Express</h4>
             <p className="text-neutral-400 text-sm mb-4">اشترك ليصلك كل جديد عن عروضنا ومجموعاتنا الجديدة.</p>
             <div className="flex">
-              <input 
-                type="email" 
-                placeholder="بريدك الإلكتروني" 
+              <input
+                type="email"
+                placeholder="بريدك الإلكتروني"
                 className="bg-neutral-900 border-none p-3 text-sm flex-1 outline-none focus:ring-1 ring-white/20"
               />
               <button className="bg-white text-black px-4 font-bold text-xs uppercase tracking-widest">اشترك</button>

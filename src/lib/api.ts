@@ -118,7 +118,7 @@ export const fetchProducts = async (): Promise<Product[]> => {
     };
   });
 
-  setCachedData('products', mappedProducts);
+  setCachedData('products', mappedProducts, 30 * 1000); // Cache for 30 seconds instead of 5 minutes
   return mappedProducts;
 };
 
