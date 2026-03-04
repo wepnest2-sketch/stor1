@@ -19,12 +19,12 @@ export const fetchCategories = async (): Promise<Category[]> => {
     .from('categories')
     .select('*')
     .order('display_order', { ascending: true });
-    
+
   if (error) {
     console.error('Error fetching categories:', error);
     return [];
   }
-  
+
   const categories = data.map((c: any) => ({
     id: c.id,
     name: c.name,
@@ -44,12 +44,12 @@ export const fetchSiteSettings = async (): Promise<SiteSettings | null> => {
     .from('site_settings')
     .select('*')
     .single();
-    
+
   if (error) {
     console.error('Error fetching site settings:', error);
     return null;
   }
-  
+
   setCachedData('site_settings', data);
   return data;
 };
@@ -62,12 +62,12 @@ export const fetchAboutUs = async (): Promise<AboutUsContent | null> => {
     .from('about_us_content')
     .select('*')
     .single();
-    
+
   if (error) {
     console.error('Error fetching about us content:', error);
     return null;
   }
-  
+
   const aboutUs = {
     title: data.title,
     content: data.content,
@@ -88,19 +88,19 @@ export const fetchProducts = async (): Promise<Product[]> => {
       *,
       product_variants (*)
     `);
-  
+
   if (error) {
     console.error('Error fetching products:', error);
     return [];
   }
-  
+
   const mappedProducts = products.map((p: any) => {
     const variants = p.product_variants || [];
     // Derive unique sizes and colors from variants
     const sizes = Array.from(new Set(variants.map((v: any) => v.size))) as string[];
     const colorsMap = new Map();
     variants.forEach((v: any) => {
-        colorsMap.set(v.color_name, { name: v.color_name, hex: v.color_hex });
+      colorsMap.set(v.color_name, { name: v.color_name, hex: v.color_hex });
     });
     const colors = Array.from(colorsMap.values()) as { name: string; hex: string }[];
 
@@ -130,7 +130,7 @@ export const fetchWilayas = async (): Promise<Wilaya[]> => {
     .from('wilayas')
     .select('*')
     .order('id', { ascending: true });
-    
+
   if (error || !data || data.length === 0) {
     if (error) console.error('Error fetching wilayas, using fallback:', error);
     // Fallback to constants if DB is empty or error
@@ -171,7 +171,7 @@ export const createOrder = async (orderData: any) => {
     }])
     .select()
     .single();
-    
+
   if (orderError) {
     console.error('Error creating order:', orderError);
     throw orderError;
@@ -186,7 +186,7 @@ export const createOrder = async (orderData: any) => {
     order_id: order.id,
     product_id: item.id,
     product_name: item.name,
-    price: item.price,
+    price: item.discount_price || item.price,
     quantity: item.quantity,
     selected_size: item.selectedSize,
     selected_color: item.selectedColor
