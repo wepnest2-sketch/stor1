@@ -140,55 +140,42 @@ interface ProductCardProps {
   key?: React.Key;
 }
 
-const ProductCard = ({ product, onClick }: ProductCardProps) => {
-  const totalStock = useMemo(() => {
-    if (!product.variants || product.variants.length === 0) return 10; // Default for non-variant products if any
-    return product.variants.reduce((sum, v) => sum + v.quantity, 0);
-  }, [product.variants]);
-
-  const isOutOfStock = totalStock === 0;
-
-  return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      className={`group cursor-pointer ${isOutOfStock ? 'opacity-60' : ''}`}
-      onClick={onClick}
-    >
-      <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100 mb-4 text-right">
-        <img
-          src={product.images[0]}
-          alt={product.name}
-          loading="lazy"
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-        />
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors" />
-        {isOutOfStock ? (
-          <span className="absolute top-2 right-2 bg-neutral-800 text-white text-[10px] font-bold px-2 py-1 rounded-sm tracking-widest uppercase">
-            نفذ من المخزون
-          </span>
-        ) : product.discount_price ? (
-          <span className="absolute top-2 right-2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-sm tracking-widest uppercase">
-            تخفيض
-          </span>
-        ) : null}
-      </div>
-      <h3 className="text-sm font-medium mb-1">{product.name}</h3>
-      <div className="flex items-center gap-2">
-        {product.discount_price ? (
-          <>
-            <p className="text-sm font-bold text-red-600">{product.discount_price.toLocaleString()} دج</p>
-            <p className="text-xs text-neutral-400 line-through">{product.price.toLocaleString()} دج</p>
-          </>
-        ) : (
-          <p className="text-sm text-neutral-500">{product.price.toLocaleString()} دج</p>
-        )}
-      </div>
-    </motion.div>
-  );
-};
+const ProductCard = ({ product, onClick }: ProductCardProps) => (
+  <motion.div
+    layout
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    className="group cursor-pointer"
+    onClick={onClick}
+  >
+    <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100 mb-4">
+      <img
+        src={product.images[0]}
+        alt={product.name}
+        loading="lazy"
+        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+      />
+      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors" />
+      {product.discount_price && (
+        <span className="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">
+          تخفيض
+        </span>
+      )}
+    </div>
+    <h3 className="text-sm font-medium mb-1">{product.name}</h3>
+    <div className="flex items-center gap-2">
+      {product.discount_price ? (
+        <>
+          <p className="text-sm font-bold text-red-600">{product.discount_price.toLocaleString()} دج</p>
+          <p className="text-xs text-neutral-400 line-through">{product.price.toLocaleString()} دج</p>
+        </>
+      ) : (
+        <p className="text-sm text-neutral-500">{product.price.toLocaleString()} دج</p>
+      )}
+    </div>
+  </motion.div>
+);
 
 const CartDrawer = ({
   isOpen,
@@ -510,13 +497,6 @@ const ProductDetailPage = ({
   }, [availableColors, selectedColor]);
 
   const isSelectionComplete = selectedSize !== '' && selectedColor !== '';
-  const isSelectedVariantAvailable = useMemo(() => {
-    if (!hasVariants) return true;
-    if (!isSelectionComplete) return true; // Show status based on selection only
-    return maxQuantity > 0;
-  }, [hasVariants, isSelectionComplete, maxQuantity]);
-
-  const canPurchase = isSelectionComplete && isSelectedVariantAvailable;
 
   const selectedWilaya = useMemo(() => wilayas.find(w => w.id === formData.wilayaId), [formData.wilayaId, wilayas]);
   const deliveryFee = selectedWilaya ? (formData.deliveryType === 'home' ? selectedWilaya.deliveryHome : selectedWilaya.deliveryPost) : 0;
@@ -676,32 +656,30 @@ const ProductDetailPage = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
             <button
-              disabled={!canPurchase}
+              disabled={!isSelectionComplete}
               onClick={() => onAddToCart({ ...product, selectedSize, selectedColor, quantity })}
-              className={`w-full py-5 font-bold tracking-widest transition-all ${canPurchase
+              className={`w-full py-5 font-bold tracking-widest transition-all ${isSelectionComplete
                 ? 'bg-neutral-100 text-black hover:bg-neutral-200'
                 : 'bg-neutral-50 text-neutral-300 cursor-not-allowed'
                 }`}
             >
-              {isSelectedVariantAvailable ? 'إضافة إلى السلة' : 'نفذ من المخزون'}
+              إضافة إلى السلة
             </button>
             <button
-              disabled={!canPurchase}
+              disabled={!isSelectionComplete}
               onClick={handleQuickOrderClick}
-              className={`w-full py-5 font-bold tracking-widest transition-all ${canPurchase
+              className={`w-full py-5 font-bold tracking-widest transition-all ${isSelectionComplete
                 ? 'bg-black text-white hover:bg-neutral-800'
                 : 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
                 }`}
             >
-              {isSelectedVariantAvailable ? 'طلب سريع الآن' : 'غير متوفر'}
+              طلب سريع الآن
             </button>
           </div>
 
-          {!isSelectionComplete ? (
+          {!isSelectionComplete && (
             <p className="text-xs text-red-500 mb-6 animate-pulse">يرجى اختيار المقاس واللون للمتابعة</p>
-          ) : !isSelectedVariantAvailable ? (
-            <p className="text-xs text-red-500 mb-6 font-bold">عذراً، هذا الخيار نفذ من المخزون حالياً</p>
-          ) : null}
+          )}
 
           <div className="border-t pt-8 space-y-4 text-sm text-neutral-600 leading-relaxed">
             <p>{product.description}</p>
